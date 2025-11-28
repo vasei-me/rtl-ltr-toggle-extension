@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { DirectionToggle } from "../components/direction-toggle.component";
-import { UrlManager } from "../components/url-manager.component";
-import { useDirection } from "../hooks/use-direction.hook";
+import { DirectionToggle } from "../components/direction-toggle.component"; // این مسیر صحیح است
+import { UrlManager } from "../components/url-manager.component"; // این مسیر صحیح است
+import { useDirection } from "../hooks/use-direction.hook"; // این مسیر صحیح است
 
 const Popup: React.FC = () => {
   const {

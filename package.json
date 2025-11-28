@@ -7,20 +7,24 @@
   "author": "Your Name",
   "type": "module",
   "scripts": {
-    "dev": "plasmo dev --skip-icons",
-    "build": "plasmo build --skip-icons",
-    "build:icons": "tsx generate-icons.ts"
+    "dev": "plasmo dev",
+    "build": "plasmo build",
+    "build:prod": "plasmo build --target=chrome-mv3-prod",
+    "build:dev": "plasmo build --target=chrome-mv3-dev",
+    "type-check": "npx tsc --noEmit"
   },
   "dependencies": {
-    "plasmo": "0.90.5",
+    "@plasmohq/storage": "^1.15.0",
+    "plasmo": "^0.90.5",
     "webextension-polyfill": "^0.12.0"
   },
   "devDependencies": {
     "@types/chrome": "^0.1.31",
     "@types/firefox-webext-browser": "^143.0.0",
     "@types/node": "^24.10.1",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "sharp": "^0.34.5"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "sharp": "^0.34.5",
+    "typescript": "^5.9.3"
   }
 }

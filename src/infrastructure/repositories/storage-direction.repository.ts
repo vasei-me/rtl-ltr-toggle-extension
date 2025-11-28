@@ -1,6 +1,7 @@
 // Add type declaration for 'browser' to support WebExtension API
 declare const browser: typeof import("webextension-polyfill");
 
+import { Storage } from "@plasmohq/storage"; // <-- Plasmo's Storage API
 import {
   type DirectionConfig,
   DirectionEntity,
@@ -9,6 +10,12 @@ import type { IDirectionRepository } from "../../core/repositories/direction-rep
 
 export class StorageDirectionRepository implements IDirectionRepository {
   private readonly STORAGE_KEY = "direction-configs";
+  private readonly storage: Storage; // <-- Use Plasmo's Storage instance
+
+  constructor() {
+    // Initialize Plasmo's storage. It's the preferred method.
+    this.storage = new Storage();
+  }
 
   async save(config: DirectionEntity): Promise<void> {
     const configs = await this.getAllConfigs();
@@ -52,6 +59,55 @@ export class StorageDirectionRepository implements IDirectionRepository {
 
   async clearAll(): Promise<void> {
     try {
+      // Use Plasmo's storage as the primary method
+      await this.storage.set(this.STORAGE_KEY, []);
+      return;
+    } catch (err) {
+      console.warn(
+        "Clearing configs with Plasmo storage failed, falling back:",
+        err
+      );
+      // Fallback to the original logic if Plasmo's fails for any reason
+      await this.fallbackClearAll();
+    }
+  }
+
+  private async getAllConfigs(): Promise<DirectionConfig[]> {
+    try {
+      // Use Plasmo's storage as the primary method
+      const result = await this.storage.get<DirectionConfig[]>(
+        this.STORAGE_KEY
+      );
+      return result || [];
+    } catch (err) {
+      console.warn(
+        "Getting configs with Plasmo storage failed, falling back:",
+        err
+      );
+      // Fallback to the original logic if Plasmo's fails for any reason
+      return await this.fallbackGetAllConfigs();
+    }
+  }
+
+  private async saveAllConfigs(configs: DirectionConfig[]): Promise<void> {
+    try {
+      // Use Plasmo's storage as the primary method
+      await this.storage.set(this.STORAGE_KEY, configs);
+      return;
+    } catch (err) {
+      console.warn(
+        "Saving configs with Plasmo storage failed, falling back:",
+        err
+      );
+      // Fallback to the original logic if Plasmo's fails for any reason
+      await this.fallbackSaveAllConfigs(configs);
+    }
+  }
+
+  // --- Fallback methods (unchanged from your original code) ---
+
+  private async fallbackClearAll(): Promise<void> {
+    try {
       if (
         typeof chrome !== "undefined" &&
         chrome.storage &&
@@ -71,24 +127,21 @@ export class StorageDirectionRepository implements IDirectionRepository {
         return;
       }
 
-      // Fallback to localStorage for dev/non-extension contexts
       if (typeof window !== "undefined" && window.localStorage) {
         window.localStorage.setItem(this.STORAGE_KEY, JSON.stringify([]));
         return;
       }
 
-      // No storage available in this environment: log and return
       console.warn("No fallback storage available to clear configs");
       return;
     } catch (err) {
-      console.warn("Clearing configs failed:", err);
+      console.warn("Fallback clearing configs failed:", err);
       return;
     }
   }
 
-  private async getAllConfigs(): Promise<DirectionConfig[]> {
+  private async fallbackGetAllConfigs(): Promise<DirectionConfig[]> {
     try {
-      // Prefer Chrome's storage API when available
       if (
         typeof chrome !== "undefined" &&
         chrome.storage &&
@@ -104,36 +157,36 @@ export class StorageDirectionRepository implements IDirectionRepository {
         });
       }
 
-      // Fall back to the browser (WebExtension) storage API if present
       if (
         typeof browser !== "undefined" &&
         browser.storage &&
         browser.storage.local
       ) {
-        console.log("Using browser.storage.local");
+        console.log("Using browser.storage.local (fallback)");
         const result = await browser.storage.local.get(this.STORAGE_KEY as any);
-        console.log("Browser storage result:", result);
         return result[this.STORAGE_KEY] || [];
       }
 
-      // As a last resort (development outside extension context), use window.localStorage if available
       if (typeof window !== "undefined" && window.localStorage) {
-        console.log("Using window.localStorage");
+        console.log("Using window.localStorage (fallback)");
         const raw = window.localStorage.getItem(this.STORAGE_KEY);
-        console.log("LocalStorage raw:", raw);
         return raw ? (JSON.parse(raw) as DirectionConfig[]) : [];
       }
 
-      // No storage available in this environment
-      console.log("No storage available");
+      console.log("No storage available (fallback)");
       return [];
     } catch (err) {
-      console.warn("Storage access failed, returning empty configs:", err);
+      console.warn(
+        "Fallback storage access failed, returning empty configs:",
+        err
+      );
       return [];
     }
   }
 
-  private async saveAllConfigs(configs: DirectionConfig[]): Promise<void> {
+  private async fallbackSaveAllConfigs(
+    configs: DirectionConfig[]
+  ): Promise<void> {
     try {
       if (
         typeof chrome !== "undefined" &&
@@ -156,20 +209,20 @@ export class StorageDirectionRepository implements IDirectionRepository {
         return;
       }
 
-      // Fallback to localStorage for dev/non-extension contexts
       if (typeof window !== "undefined" && window.localStorage) {
         window.localStorage.setItem(this.STORAGE_KEY, JSON.stringify(configs));
         return;
       }
 
-      // No storage available in this environment: log and return
       console.warn("No fallback storage available to save configs");
       return;
     } catch (err) {
-      console.warn("Saving configs failed:", err);
+      console.warn("Fallback saving configs failed:", err);
       return;
     }
   }
+
+  // --- Helper methods (unchanged) ---
 
   private entityToConfig(entity: DirectionEntity): DirectionConfig {
     return {

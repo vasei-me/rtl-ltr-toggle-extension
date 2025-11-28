@@ -1,0 +1,18 @@
+import React from 'react'; import { createRoot } from 'react-dom/client'; import
+{ useStorage } from "@plasmohq/storage/hook"; // <-- ایمپورت هوک import Popup
+from "./presentation/popup"; console.log("Popup.tsx loaded"); // پیدا کردن
+المانی که React باید در آن رندر شود const container =
+document.getElementById('popup-root'); if (!container) { throw new Error('Root
+container not found'); } const root = createRoot(container); // رندر کردن
+کامپوننت اصلی در آن المان root.render(<Popup />); // در کامپوننت Popup خود از
+این هوک استفاده کنید // مثال در فایل src/presentation/popup.tsx: /* import {
+useStorage } from "@plasmohq/storage/hook"; function PopupComponent() { const
+[direction, setDirection] = useStorage("direction-key", "ltr"); const
+toggleDirection = () => { const newDirection = direction === "ltr" ? "rtl" :
+"ltr"; setDirection(newDirection); // ... کد برای ارسال پیام به content script
+}; return (
+<div>
+  <p>Current Direction: {direction}</p>
+  <button onClick="{toggleDirection}">Toggle</button>
+</div>
+); } */

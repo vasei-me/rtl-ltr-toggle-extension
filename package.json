@@ -1,0 +1,26 @@
+{
+  "name": "rtl-ltr-extension",
+  "displayName": "RTL/LTR Extension",
+  "version": "1.0.0",
+  "description": "A browser extension to toggle between RTL and LTR text direction for websites",
+  "license": "MIT",
+  "author": "Your Name",
+  "type": "module",
+  "scripts": {
+    "dev": "plasmo dev --skip-icons",
+    "build": "plasmo build --skip-icons",
+    "build:icons": "tsx generate-icons.ts"
+  },
+  "dependencies": {
+    "plasmo": "0.90.5",
+    "webextension-polyfill": "^0.12.0"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.1.31",
+    "@types/firefox-webext-browser": "^143.0.0",
+    "@types/node": "^24.10.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "sharp": "^0.34.5"
+  }
+}

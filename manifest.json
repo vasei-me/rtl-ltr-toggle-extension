@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "RTL/LTR Extension",
+  "description": "Toggle between RTL and LTR text direction for websites",
+  "version": "1.0.0",
+  "permissions": ["storage"],
+  "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_popup": "src/popup.html",
+    "default_title": "RTL/LTR Manager"
+  }
+}
